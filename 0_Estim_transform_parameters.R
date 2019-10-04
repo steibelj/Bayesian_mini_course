@@ -28,6 +28,21 @@ dim(trial1.event)
 #-------------------------------------------------------------------------------------
 # Desing matrix with fixed effects
 Xmatrix = model.matrix(~trial1.event$Location + trial1.event$wt_md -1)
+stanDat0 <- list(Nobs = nrow(trial1.event), 
+                 Npreds=ncol(Xmatrix),
+                 x = Xmatrix,
+                 y = trial1.event$visit.length)
+
+system.time(
+  {m0t1 <- stan(file =  "M0_trial1.stan", data = stanDat0,
+                pars = c("beta", "var_error"),
+                save_warmup=FALSE,iter = 10000, chains = 1, warmup = 2000)})
+
+save(m0t1, file="M0_trial1_Stan.Rdata")
+m0t1
+
+
+
 # Eartag vector
 Eartag<-as.numeric(as.factor(trial1.event$Ear_Tag))
 # Stan data file
@@ -41,9 +56,9 @@ stanDat1 <- list(Nobs = nrow(trial1.event),
 # 1.1. Sample from posterior distribution
 
 system.time(
-  {m1t1 <- stan(file =  "M1_trial1.stan", data = stanDat1,
+  {m1t1 <- stan(file =  "M1_trial1_chol.stan", data = stanDat1,
                 pars = c("beta", "var_eartag", "var_error", "prp_var_eartag","prp_var_error"),
-                save_warmup=FALSE,iter = 6000, chains = 1, warmup = 1000)})
+                save_warmup=FALSE,iter = 10000, chains = 1, warmup = 2000)})
 
 save(m1t1, file="M1_trial1_Stan.Rdata")
 
@@ -69,10 +84,10 @@ stanDat2 <- list(Nobs = nrow(trial1.event),
 # 2.1. Sample from posterior distribution
 #-------- 
 system.time({
-  m2t1<- stan(file = "M2_trial1.stan", data = stanDat2,
+  m2t1<- stan(file = "M2_trial1_chol.stan", data = stanDat2,
               pars = c("beta", "var_eartag", "var_follower","var_error", 
                        "prp_var_eartag","prp_var_follower","prp_var_error"),
-              save_warmup=FALSE,iter = 12000, chains = 1, warmup = 2000)})
+              save_warmup=FALSE,iter = 10000, chains = 1, warmup = 2000)})
 
 
 save(m2t1, file = "M2_trial1_Stan.Rdata")
@@ -94,10 +109,10 @@ stanDat3 <- list(Nobs = nrow(trial1.event),
 # 3. 1. Sampling posterior distribution
 
 system.time({
-  m3t1 <- stan(file =  "M3_trial1.stan", data = stanDat3,
+  m3t1 <- stan(file =  "M3_trial1_chol.stan", data = stanDat3,
               pars = c("beta","rho", "var_eartag", "var_follower", "var_error",
                        "prp_var_eartag","prp_var_follower","prp_var_error"),
-              save_warmup=FALSE,iter = 12000, chains = 1, warmup = 2000)})
+              save_warmup=FALSE,iter = 10000, chains = 1, warmup = 2000)})
 
 save(m3t1, file = "M3_trial1_Stan.Rdata")
 
